@@ -207,5 +207,17 @@ class Window:
         return self.labels, self.buttons, self.listboxes
 
     @staticmethod
+    def generate_paragraphs(paragraphs: list, first_label_position: list, step: int, properties: dict=None, numbering: bool=False) -> list:
+        total = list()
+        if numbering:
+            paragraphs = [str(number + 1) + '. ' + str(paragraphs[number]) for number in range(len(paragraphs))]
+        for i in range(len(paragraphs)):
+            x, y = first_label_position
+            dictionary = dict(text=paragraphs[i], position=[x, y + (i * step)])
+            dictionary.update(properties)
+            total.append(dictionary)
+        return total
+
+    @staticmethod
     def get_element_property(element: object, property_name: str):
         return element[property_name]
