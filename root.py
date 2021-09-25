@@ -1,4 +1,5 @@
 import sqlite3
+from tkinter import *
 
 from time import sleep
 from random import randint
@@ -118,7 +119,7 @@ class VkBot(Bot):
         friends = self.vk.method('friends.get')
         return friends['items']
 
-    def start_longpoll(self, bot_asks):
+    def start_longpoll(self, bot_asks: dict):
         longpoll = VkLongPoll(self.vk)
         for event in longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
@@ -155,3 +156,43 @@ class VkBot(Bot):
     def add_by_id(self, vk_id: int):
         name = self.get_vk_name(vk_id)
         self.base.add([vk_id, name])
+
+
+class Window:
+    labels, buttons, listboxes = list(), list(), list()
+
+    def __init__(self, size: list, title: str, elements: dict):
+        self.elements = elements
+
+        self.root = Tk()
+
+        self.root.wm_title(title)
+        self.root.geometry('x'.join(map(lambda item: str(item), size)))
+        self.root.minsize(*size)
+        self.root.maxsize(*size)
+        self.draw_elements()
+
+        self.root.mainloop()
+
+    def draw_elements(self):
+        for key, value in self.elements.items():
+            for obj_properties in value:
+                try:
+                    position = obj_properties['position']
+                    del obj_properties['position']
+                except KeyError:
+                    raise KeyError('Вы не ввели свойство position')
+
+                if key == 'Label':
+                    obj = Label(self.root, obj_properties)
+                    self.labels.append(obj)
+                elif key == 'Button':
+                    obj = Button(self. root, obj_properties)
+                    self.buttons.append(obj)
+                else:
+                    raise KeyError(f'Объекта {key} не существует')
+
+                obj.place(x=position[0], y=position[1])
+
+    def get_elements(self) -> tuple:
+        return self.labels, self.buttons, self.listboxes
