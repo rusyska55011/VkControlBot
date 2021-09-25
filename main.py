@@ -1,21 +1,27 @@
-import root
+from root import Window
+import webbrowser
+
 
 class ButtonActions:
     @staticmethod
     def _open_browser(url):
         webbrowser.open(url)
 
-class Authorization(root.Window):
+
+class Authorization(Window, ButtonActions):
     is_authorized = False
     elements = {
         'Label': [
-            dict(font=("Lucida Grande", 12), text='Введите бюджет', position=[10, 10]),
-            dict(font=("Lucida Grande", 12), text='1111', position=[60, 100]),
+            dict(font=("Lucida Grande", 26), text='Авторизация через токен', position=[70, 50]),
+            dict(font=("Lucida Grande", 12), text='Введите токен:', position=[222, 165]),
         ],
         'Button': [
-            dict(font=("Lucida Grande", 12), text='Введите бюджет', position=[10, 200]),
-            dict(font=("Lucida Grande", 12), text='Отправить', position=[10, 300]),
-        ]
+            dict(font=("Lucida Grande", 12), text='Подключиться', position=[220, 250]),
+            dict(font=("Lucida Grande", 9), text='Как получить токен', position=[10, 363]),
+        ],
+        'Text': [
+            dict(font=("Lucida Grande", 12), height=2, width=50, position=[50, 200])
+        ],
     }
 
     def __init__(self):
@@ -27,7 +33,10 @@ class Authorization(root.Window):
 
 class Start:
     def __init__(self):
-        print(Authorization().get_elements())
+        auth = Authorization()
+        auth.draw_elements()
+        auth.start()
+        a = auth.get_elements()[0][0]
 
 
 Start()
