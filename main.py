@@ -1,5 +1,9 @@
 import root
 
+class ButtonActions:
+    @staticmethod
+    def _open_browser(url):
+        webbrowser.open(url)
 
 class Authorization(root.Window):
     is_authorized = False
