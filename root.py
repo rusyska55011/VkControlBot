@@ -170,9 +170,12 @@ class Window:
         self.root.geometry('x'.join(map(lambda item: str(item), size)))
         self.root.minsize(*size)
         self.root.maxsize(*size)
-        self.draw_elements()
 
+    def start(self):
         self.root.mainloop()
+
+    def quit(self):
+        self.root.destroy()
 
     def draw_elements(self):
         for key, value in self.elements.items():
@@ -196,3 +199,7 @@ class Window:
 
     def get_elements(self) -> tuple:
         return self.labels, self.buttons, self.listboxes
+
+    @staticmethod
+    def get_element_property(element: object, property_name: str):
+        return element[property_name]
