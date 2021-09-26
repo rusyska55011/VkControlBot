@@ -48,9 +48,11 @@ class Console(Window, ButtonActions):
             super(Console, self).__init__([554, 400], 'Консоль VkApi', self.elements)
 
     def get_response(self) -> dict:
+        message = self.message
+        self.message = str()
         return {
             'status': self.is_authorized,
-            'message': self.message
+            'message': message
         }
 
 
