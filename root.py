@@ -186,9 +186,18 @@ class Window:
     def quit(self):
         self.root.destroy()
 
-    def change_element(self, element_type: str, element_position: int, properties: dict):
+    def replace_element(self, element_type: str, element_position: int, properties: dict):
         del self.elements[element_type][element_position]
         self.elements[element_type].append(properties)
+
+    def change_element(self, element_type: str, element_position: int, changes: dict):
+        old_element = self.elements[element_type][element_position]
+        for change in changes:
+            try:
+                del old_element[change]
+            except KeyError:
+                continue
+        old_element.update(changes)
 
     def draw_elements(self):
         for key, value in self.elements.items():
