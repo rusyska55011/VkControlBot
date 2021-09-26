@@ -200,6 +200,11 @@ class Window:
         old_element.update(changes)
 
     def draw_elements(self):
+        for item in [self.labels, self.buttons, self.texts, self.listboxes, self.entries]:
+            for tk_obj in item:
+                tk_obj.destroy()
+            item.clear()
+
         for key, value in self.elements.items():
             for obj_properties in value:
                 try:
