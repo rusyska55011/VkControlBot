@@ -168,7 +168,7 @@ class VkBot(Bot):
 
 
 class Window:
-    labels, buttons, text, listboxes, entry = list(), list(), list(), list(), list()
+    labels, buttons, texts, listboxes, entries = list(), list(), list(), list(), list()
 
     def __init__(self, size: list, title: str, elements: dict):
         self.elements = elements
@@ -203,20 +203,27 @@ class Window:
                     self.buttons.append(obj)
                 elif key == 'Text':
                     obj = Text(self.root, obj_properties)
-                    self.text.append(obj)
+                    self.texts.append(obj)
                 elif key == 'ListBox':
                     obj = Listbox(self.root, obj_properties)
                     self.listboxes.append(obj)
                 elif key == 'Entry':
                     obj = Entry(self.root, obj_properties)
-                    self.entry.append(obj)
+                    self.entries.append(obj)
                 else:
                     raise KeyError(f'Объекта {key} не существует')
 
                 obj.place(x=position[0], y=position[1])
 
-    def get_elements(self) -> tuple:
-        return self.labels, self.buttons, self.listboxes
+    def get_elements(self) -> dict:
+        return {
+            'Label': self.labels,
+            'Button': self.buttons,
+            'Text': self.texts,
+            'Listbox': self.listboxes,
+            'Entry': self.entries
+        }
+
 
     @staticmethod
     def generate_paragraphs(paragraphs: list, first_label_position: list, step: int, properties: dict=None, numbering: bool=False) -> list:
