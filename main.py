@@ -39,6 +39,7 @@ class Console(Window, ButtonActions):
 
         if self.vk.get_token_valid():
             self.is_authorized = True
+        else:
             self.message = 'Введенный токен некорректен'
 
         self.elements = {
