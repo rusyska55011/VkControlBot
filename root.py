@@ -159,7 +159,7 @@ class VkBot(Bot):
 
 
 class Window:
-    labels, buttons, text, listboxes = list(), list(), list(), list()
+    labels, buttons, text, listboxes, entry = list(), list(), list(), list(), list()
 
     def __init__(self, size: list, title: str, elements: dict):
         self.elements = elements
@@ -198,6 +198,9 @@ class Window:
                 elif key == 'ListBox':
                     obj = Listbox(self.root, obj_properties)
                     self.listboxes.append(obj)
+                elif key == 'Entry':
+                    obj = Entry(self.root, obj_properties)
+                    self.entry.append(obj)
                 else:
                     raise KeyError(f'Объекта {key} не существует')
 
