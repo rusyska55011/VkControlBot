@@ -64,6 +64,7 @@ class Authorization(Window, ButtonActions):
             'Label': [
                 dict(font=("Lucida Grande", 26), text='Авторизация через токен', position=[70, 50]),
                 dict(font=("Lucida Grande", 12), text='Введите токен:', position=[222, 165]),
+                dict(font=("Lucida Grande", 12), fg='#F00', position=[200, 300])
             ],
             'Button': [
                 dict(font=("Lucida Grande", 12), text='Подключиться',
@@ -77,13 +78,21 @@ class Authorization(Window, ButtonActions):
         }
         super(Authorization, self).__init__([554, 400], 'Авторизация', self.elements)
 
-    def __open_console(self, text_position: int):
-        token = self.get_elements()['Entry'][int(text_position)].get()
+    def __open_console(self, text_position: int) -> dict:
+        token = self.get_entry_text(self.get_elements()['Entry'][int(text_position)])
+        print(token)
         if not token:
-            raise ValueError('Вы не ввели токен!')
-        console = Console(token=token)
-        console.draw_elements()
-        self.quit()
+            self.change_element('Label', 2, dict(text='Вы не ввели значение!', position=[200, 300]))
+            self.draw_elements()
+        else:
+            console = Console(token=token)
+            response, message = console.get_response().values()
+            if not response:
+                self.change_element('Label', 2, dict(text=message, position=[180, 300]))
+                self.draw_elements()
+            else:
+                console.draw_elements()
+                self.quit()
 
     @staticmethod
     def __open_instruction():
