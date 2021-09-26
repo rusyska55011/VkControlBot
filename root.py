@@ -186,6 +186,10 @@ class Window:
     def quit(self):
         self.root.destroy()
 
+    def change_element(self, element_type: str, element_position: int, properties: dict):
+        del self.elements[element_type][element_position]
+        self.elements[element_type].append(properties)
+
     def draw_elements(self):
         for key, value in self.elements.items():
             for obj_properties in value:
