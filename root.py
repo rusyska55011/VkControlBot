@@ -119,6 +119,15 @@ class VkBot(Bot):
         friends = self.vk.method('friends.get')
         return friends['items']
 
+    def get_token_valid(self) -> bool:
+        # Отправляем любой запрос
+        try:
+            self.get_friends_list()
+        except vk_api.exceptions.ApiError:
+            return False
+        else:
+            return True
+
     def start_longpoll(self, bot_asks: dict):
         longpoll = VkLongPoll(self.vk)
         for event in longpoll.listen():
