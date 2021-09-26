@@ -80,7 +80,6 @@ class Authorization(Window, ButtonActions):
 
     def __open_console(self, text_position: int) -> dict:
         token = self.get_entry_text(self.get_elements()['Entry'][int(text_position)])
-        print(token)
         if not token:
             self.change_element('Label', 2, dict(text='Вы не ввели значение!', position=[200, 300]))
             self.draw_elements()

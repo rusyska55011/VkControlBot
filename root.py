@@ -168,9 +168,9 @@ class VkBot(Bot):
 
 
 class Window:
-    labels, buttons, texts, listboxes, entries = list(), list(), list(), list(), list()
-
     def __init__(self, size: list, title: str, elements: dict):
+        self.labels, self.buttons, self.texts, self.listboxes, self.entries = list(), list(), list(), list(), list()
+
         self.elements = elements
 
         self.root = Tk()
