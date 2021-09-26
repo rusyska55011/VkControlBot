@@ -195,24 +195,25 @@ class Window:
             for obj_properties in value:
                 try:
                     position = obj_properties['position']
-                    del obj_properties['position']
+                    obj_properties_clone = obj_properties.copy()
+                    del obj_properties_clone['position']
                 except KeyError:
                     raise KeyError('Вы не ввели свойство position')
 
                 if key == 'Label':
-                    obj = Label(self.root, obj_properties)
+                    obj = Label(self.root, obj_properties_clone)
                     self.labels.append(obj)
                 elif key == 'Button':
-                    obj = Button(self.root, obj_properties)
+                    obj = Button(self.root, obj_properties_clone)
                     self.buttons.append(obj)
                 elif key == 'Text':
-                    obj = Text(self.root, obj_properties)
+                    obj = Text(self.root, obj_properties_clone)
                     self.texts.append(obj)
                 elif key == 'ListBox':
-                    obj = Listbox(self.root, obj_properties)
+                    obj = Listbox(self.root, obj_properties_clone)
                     self.listboxes.append(obj)
                 elif key == 'Entry':
-                    obj = Entry(self.root, obj_properties)
+                    obj = Entry(self.root, obj_properties_clone)
                     self.entries.append(obj)
                 else:
                     raise KeyError(f'Объекта {key} не существует')
@@ -227,7 +228,6 @@ class Window:
             'Listbox': self.listboxes,
             'Entry': self.entries
         }
-
 
     @staticmethod
     def generate_paragraphs(paragraphs: list, first_label_position: list, step: int, properties: dict=None, numbering: bool=False) -> list:
