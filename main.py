@@ -1,4 +1,4 @@
-from root import Window
+from root import Window, VkBot
 import webbrowser
 
 
@@ -26,12 +26,30 @@ class Instruction(Window, ButtonActions):
                      position=[10, 240]),
             ],
         }
-
         super(Instruction, self).__init__([554, 400], 'Иструкция', self.elements)
 
 
-class Authorization(Window, ButtonActions):
+class Console(Window, ButtonActions):
     is_authorized = False
+
+    def __init__(self, token):
+        self.token = token
+        self.vk = VkBot(self.token)
+
+        if self.vk.get_token_valid():
+            self.is_authorized = True
+
+        self.elements = {
+        }
+        if self.is_authorized:
+            super(Console, self).__init__([554, 400], 'Консоль VkApi', self.elements)
+
+    def get_response(self):
+        return self.is_authorized
+
+
+class Authorization(Window, ButtonActions):
+    token = None
 
     def __init__(self):
         self.elements = {
@@ -40,9 +58,10 @@ class Authorization(Window, ButtonActions):
                 dict(font=("Lucida Grande", 12), text='Введите токен:', position=[222, 165]),
             ],
             'Button': [
-                dict(font=("Lucida Grande", 12), text='Подключиться', position=[220, 250]),
+                dict(font=("Lucida Grande", 12), text='Подключиться',
+                     command=lambda: self.__open_console(0), position=[220, 250]),
                 dict(font=("Lucida Grande", 9), text='Как получить токен',
-                     command=lambda: Instruction().draw_elements(), position=[10, 363]),
+                     command=lambda: self.__open_instruction(), position=[10, 363]),
             ],
             'Entry': [
                 dict(font=("Lucida Grande", 12), width=50, position=[50, 200])
@@ -50,8 +69,17 @@ class Authorization(Window, ButtonActions):
         }
         super(Authorization, self).__init__([554, 400], 'Авторизация', self.elements)
 
-    def get_response(self):
-        return self.is_authorized
+    def __open_console(self, text_position: int):
+        token = self.get_elements()['Entry'][int(text_position)].get()
+        if not token:
+            raise ValueError('Вы не ввели токен!')
+        console = Console(token=token)
+        console.draw_elements()
+        self.quit()
+
+    @staticmethod
+    def __open_instruction():
+        Instruction().draw_elements()
 
 
 class Start:
