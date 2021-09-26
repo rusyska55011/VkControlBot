@@ -31,6 +31,7 @@ class Instruction(Window, ButtonActions):
 
 class Console(Window, ButtonActions):
     is_authorized = False
+    message = str()
 
     def __init__(self, token):
         self.token = token
@@ -38,14 +39,18 @@ class Console(Window, ButtonActions):
 
         if self.vk.get_token_valid():
             self.is_authorized = True
+            self.message = 'Введенный токен некорректен'
 
         self.elements = {
         }
         if self.is_authorized:
             super(Console, self).__init__([554, 400], 'Консоль VkApi', self.elements)
 
-    def get_response(self):
-        return self.is_authorized
+    def get_response(self) -> dict:
+        return {
+            'status': self.is_authorized,
+            'message': self.message
+        }
 
 
 class Authorization(Window, ButtonActions):
