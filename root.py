@@ -244,3 +244,7 @@ class Window:
     @staticmethod
     def get_element_property(element: object, property_name: str):
         return element[property_name]
+
+    @staticmethod
+    def get_entry_text(element: Entry) -> str:
+        return element.get()
