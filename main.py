@@ -44,8 +44,8 @@ class Authorization(Window, ButtonActions):
                 dict(font=("Lucida Grande", 9), text='Как получить токен',
                      command=lambda: Instruction().draw_elements(), position=[10, 363]),
             ],
-            'Text': [
-                dict(font=("Lucida Grande", 12), height=2, width=50, position=[50, 200])
+            'Entry': [
+                dict(font=("Lucida Grande", 12), width=50, position=[50, 200])
             ],
         }
         super(Authorization, self).__init__([554, 400], 'Авторизация', self.elements)
