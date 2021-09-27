@@ -109,6 +109,9 @@ class VkBot(Bot):
         self.vk = vk_api.VkApi(token=access_token)
         self.base = VkBase()
 
+    def get_profile_info(self) -> dict:
+        return self.vk.method('account.getProfileInfo')
+
     def get_vk_name(self, vk_id: int) -> str:
         user_get = self.vk.method('users.get', {
             'user_id': vk_id
