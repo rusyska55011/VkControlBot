@@ -257,12 +257,12 @@ class Window:
             'Label': self.labels,
             'Button': self.buttons,
             'Text': self.texts,
-            'Listbox': self.listboxes,
+            'ListBox': self.listboxes,
             'Entry': self.entries
         }
 
     @staticmethod
-    def generate_paragraphs(paragraphs: list, first_label_position: list, step: int, properties: dict=None, numbering: bool=False) -> list:
+    def generate_paragraphs(paragraphs: list, first_label_position: list, step: int, properties: dict=None, numbering: bool=False) -> [str]:
         total = list()
         if numbering:
             paragraphs = [str(number + 1) + '. ' + str(paragraphs[number]) for number in range(len(paragraphs))]
@@ -280,3 +280,19 @@ class Window:
     @staticmethod
     def get_entry_text(element: Entry) -> str:
         return element.get()
+
+    @staticmethod
+    def generate_db_view(*data: list) -> [str]:
+        max_len = int()
+        for item in data:
+            for string in item:
+                max_len = len(string) if len(string) > max_len else max_len
+
+        total = list()
+        for item in data:
+            total_string = '| '
+            for string in item:
+                total_string += string + (' ' * (max_len - len(string)) + ' | ')
+            total.append(total_string + ' |')
+
+        return total
