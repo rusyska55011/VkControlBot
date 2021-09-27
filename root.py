@@ -203,6 +203,12 @@ class Window:
         old_element.update(changes)
 
     def draw_elements(self):
+        # Сохраняем данные элементов
+        data = {
+            'ListBox': [item.get(0, item.size()) for item in self.listboxes],
+            'Entry': [item.get() for item in self.entries]
+        }
+
         for item in [self.labels, self.buttons, self.texts, self.listboxes, self.entries]:
             for tk_obj in item:
                 tk_obj.destroy()
@@ -228,9 +234,18 @@ class Window:
                     self.texts.append(obj)
                 elif key == 'ListBox':
                     obj = Listbox(self.root, obj_properties_clone)
+                    this_data = data['ListBox']
+                    if this_data:
+                        for i in range(len(this_data[0])):
+                            obj.insert(0, this_data[0][i])
+                        del this_data[0]
                     self.listboxes.append(obj)
                 elif key == 'Entry':
                     obj = Entry(self.root, obj_properties_clone)
+                    this_data = data['Entry']
+                    if this_data:
+                        obj.insert(0, this_data[0])
+                        del this_data[0]
                     self.entries.append(obj)
                 else:
                     raise KeyError(f'Объекта {key} не существует')
