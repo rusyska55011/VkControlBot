@@ -19,14 +19,14 @@ class Instruction(Window, ButtonActions):
     def __init__(self):
         self.elements = {
             'Label': [
-                dict(font=("Lucida Grande", 26), text='Как получить токен?', position=[10, 30]),
+                dict(font=("Lucida Grande", 26), text='Как получить токен?', bg='#fff', position=[10, 30]),
             ] + self.generate_paragraphs(self.instruction_text, [10, 80], 25, dict(font=("Lucida Grande", 12)), True),
             'Button': [
                 dict(font=("Lucida Grande", 12), text='Перейти на страницу получения токена', command=lambda: self._open_browser(self.link),
                      position=[10, 240]),
             ],
         }
-        super(Instruction, self).__init__([554, 400], 'Иструкция', self.elements)
+        super(Instruction, self).__init__([554, 400], 'Инструкция', self.elements)
 
 
 class Console(Window, ButtonActions):
@@ -39,13 +39,24 @@ class Console(Window, ButtonActions):
 
         if self.vk.get_token_valid():
             self.is_authorized = True
+
+            user_info = self.vk.get_profile_info()
+            self.elements = {
+                'Label': [
+                    dict(font=("Lucida Grande", 26), text='Консоль управления ботом', bg='#fff', position=[50, 10]),
+                    dict(font=("Lucida Grande", 16), text=f'Приветсвую, {user_info["first_name"]}!', bg='#fff', position=[50, 50])
+                ],
+                'Button': [
+                    dict(font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', position=[50, 100]),
+                    dict(font=("Lucida Grande", 12), text='Редактировать базу данных', position=[50, 140]),
+                    dict(font=("Lucida Grande", 12), text='Запушить сообщения', position=[50, 200]),
+                ]
+            }
         else:
             self.message = 'Введенный токен некорректен'
-
-        self.elements = {
-        }
+            self.elements = dict()
         if self.is_authorized:
-            super(Console, self).__init__([554, 400], 'Консоль VkApi', self.elements)
+            super(Console, self).__init__([554, 250], 'Консоль VkApi', self.elements)
 
     def get_response(self) -> dict:
         message = self.message
@@ -62,7 +73,7 @@ class Authorization(Window, ButtonActions):
     def __init__(self):
         self.elements = {
             'Label': [
-                dict(font=("Lucida Grande", 26), text='Авторизация через токен', position=[70, 50]),
+                dict(font=("Lucida Grande", 26), text='Авторизация через токен', bg='#fff', position=[70, 50]),
                 dict(font=("Lucida Grande", 12), text='Введите токен:', position=[222, 165]),
                 dict(font=("Lucida Grande", 12), fg='#F00', position=[200, 300])
             ],
