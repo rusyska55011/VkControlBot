@@ -282,17 +282,22 @@ class Window:
         return element.get()
 
     @staticmethod
-    def generate_db_view(*data: list) -> [str]:
+    def generate_db_view(cols: list, *data: [str]) -> [str]:
         max_len = int()
         for item in data:
+            if len(cols) != len(item):
+                raise KeyError('Не все элеменеты равны количеству колонок')
             for string in item:
-                max_len = len(string) if len(string) > max_len else max_len
+                max_len = len(str(string)) if len(str(string)) > max_len else max_len
 
         total = list()
+        total.append('| ' + ' | '.join([col + (' ' * (max_len - len(col))) for col in cols]) + ' |')
+        total.append('-' + '-' * (len(cols) + max_len) * 3)
+
         for item in data:
             total_string = '| '
             for string in item:
-                total_string += string + (' ' * (max_len - len(string)) + ' | ')
-            total.append(total_string + ' |')
+                total_string += str(string) + (' ' * (max_len - len(str(string))) + ' | ')
+            total.append(total_string)
 
         return total
