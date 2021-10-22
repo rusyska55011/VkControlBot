@@ -1,5 +1,6 @@
-from root import Window, VkBot
+from root import Window, VkBot, VkBase
 import webbrowser
+from tkinter import Tk, Label, Button, Listbox, Entry, Checkbutton, IntVar, END
 
 
 class ButtonActions:
@@ -29,6 +30,56 @@ class Instruction(Window, ButtonActions):
         super(Instruction, self).__init__([554, 400], 'Инструкция', self.elements)
 
 
+class DbView(ButtonActions):
+    h1 = dict(font=("Lucida Grande", 26), bg='#fafafa', padx=30)
+    h2, h2['font'] = h1.copy(), ("Lucida Grande", 18)
+    h3 = dict(font=("Lucida Grande", 13))
+
+    entry_style = dict(font=("Lucida Grande", 12))
+
+    button_style = dict(font=("Lucida Grande", 10), pady=5, padx=5)
+    start_button_style, start_button_style['font'] = button_style.copy(), ("Lucida Grande", 15)
+
+    def __init__(self):
+        vk_base = VkBase()
+        self.cols = vk_base.get_col_names().split(',')
+        self.data = vk_base.read()
+
+        title = 'Просмотр базы данных'
+        size = (554, 400)
+        self.root = Tk()
+
+        self.root.wm_title(title)
+        self.root.geometry('x'.join(map(lambda item: str(item), size)))
+        self.root.minsize(*size)
+        self.root.maxsize(*size)
+        self.elements()
+
+        self.__append_listbox()
+
+    def start(self):
+        self.root.mainloop()
+
+    def __append_listbox(self):
+        for item in self.data:
+            total = str()
+            for i in range(len(item)):
+                total += f'{self.cols[i]} : {item[i]}'
+                if i != len(item) - 1:
+                    total += ' | '
+
+            self.listbox.insert(END, str(total))
+
+    def elements(self):
+        #Labels
+        self.label = Label(self.root, text='Просмотр базы данных', **self.h1)
+        self.label.place(x=55, y=10)
+
+        # ListBoxes
+        self.listbox = Listbox(self.root, width=48, height=13, font=("Lucida Grande", 15))
+        self.listbox.place(x=10, y=70)
+
+
 class Console(Window, ButtonActions):
     is_authorized = False
     message = str()
@@ -47,7 +98,7 @@ class Console(Window, ButtonActions):
                     dict(font=("Lucida Grande", 16), text=f'Приветсвую, {user_info["first_name"]}!', bg='#fff', position=[50, 50])
                 ],
                 'Button': [
-                    dict(font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', position=[50, 100]),
+                    dict(font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', position=[50, 100], command=lambda: DbView().start()),
                     dict(font=("Lucida Grande", 12), text='Редактировать базу данных', position=[50, 140]),
                     dict(font=("Lucida Grande", 12), text='Запушить сообщения', position=[50, 200]),
                 ]
@@ -55,6 +106,7 @@ class Console(Window, ButtonActions):
         else:
             self.message = 'Введенный токен некорректен'
             self.elements = dict()
+
         if self.is_authorized:
             super(Console, self).__init__([554, 250], 'Консоль VkApi', self.elements)
 
@@ -114,7 +166,6 @@ class Start:
         auth = Authorization()
         auth.draw_elements()
         auth.start()
-
 
 Start()
 
