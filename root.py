@@ -218,10 +218,11 @@ class Window:
             for obj_properties in value:
                 try:
                     position = obj_properties['position']
-                    obj_properties_clone = obj_properties.copy()
-                    del obj_properties_clone['position']
                 except KeyError:
                     raise KeyError('Вы не ввели свойство position')
+                else:
+                    obj_properties_clone = obj_properties.copy()
+                    del obj_properties_clone['position']
 
                 if key == 'Label':
                     obj = Label(self.root, obj_properties_clone)
@@ -233,12 +234,24 @@ class Window:
                     obj = Text(self.root, obj_properties_clone)
                     self.texts.append(obj)
                 elif key == 'ListBox':
+                    try:
+                        insert_args = obj_properties_clone['insert_args']
+                    except:
+                        insert_args = list()
+                    else:
+                        del obj_properties_clone['insert_args']
+
                     obj = Listbox(self.root, obj_properties_clone)
+
+                    for i in range(len(insert_args)):
+                        obj.insert(i, insert_args[i])
+
                     this_data = data['ListBox']
                     if this_data:
                         for i in range(len(this_data[0])):
                             obj.insert(0, this_data[0][i])
                         del this_data[0]
+
                     self.listboxes.append(obj)
                 elif key == 'Entry':
                     obj = Entry(self.root, obj_properties_clone)
@@ -281,23 +294,3 @@ class Window:
     def get_entry_text(element: Entry) -> str:
         return element.get()
 
-    @staticmethod
-    def generate_db_view(cols: list, *data: [str]) -> [str]:
-        max_len = int()
-        for item in data:
-            if len(cols) != len(item):
-                raise KeyError('Не все элеменеты равны количеству колонок')
-            for string in item:
-                max_len = len(str(string)) if len(str(string)) > max_len else max_len
-
-        total = list()
-        total.append('| ' + ' | '.join([col + (' ' * (max_len - len(col))) for col in cols]) + ' |')
-        total.append('-' + '-' * (len(cols) + max_len) * 3)
-
-        for item in data:
-            total_string = '| '
-            for string in item:
-                total_string += str(string) + (' ' * (max_len - len(str(string))) + ' | ')
-            total.append(total_string)
-
-        return total
