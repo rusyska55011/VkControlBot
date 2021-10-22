@@ -1,5 +1,6 @@
-from root import Window, VkBot, VkBase, Window1
 import webbrowser
+import sqlite3
+from root import Window, VkBot, VkBase, Window1
 from tkinter import Tk, Label, Button, Listbox, Entry, Checkbutton, IntVar, END
 
 
@@ -30,7 +31,7 @@ class Instruction(Window, ButtonActions):
         super(Instruction, self).__init__([554, 400], 'Инструкция', self.elements)
 
 
-class DbView(Window1,ButtonActions):
+class DbView(Window1, ButtonActions):
     def __init__(self):
         vk_base = VkBase()
         self.cols = vk_base.get_col_names().split(',')
@@ -63,6 +64,67 @@ class DbView(Window1,ButtonActions):
         self.listbox.place(x=10, y=70)
 
 
+class DbChange(Window1, ButtonActions):
+    def __init__(self, vk: VkBot):
+        self.vk = vk
+        self.VkBase = VkBase()
+        super(DbChange, self).__init__('Реактирование Базы Данных', [554, 400])
+
+    def elements(self):
+        #Labels
+        self.label = Label(self.root, text='Редактирование базы данных', **self.h1)
+        self.label.place(x=8, y=10)
+
+        self.label2 = Label(self.root, text='Введите ID', **self.h3)
+        self.label2.place(x=230, y=120)
+
+        self.event_label = Label(self.root, text='Ошибка', fg='#f00', **self.h3)
+        self.event_label.place(x=10, y=360)
+
+        #Buttons
+        self.button_add = Button(self.root, text='Добавить', command=lambda: self.__append_base(self.entry.get()), **self.button_style_big)
+        self.button_add.place(x=180, y=180)
+
+        self.button_delete = Button(self.root, text='Удалить', command=lambda: self.__delete_base(self.entry.get()), **self.button_style_big)
+        self.button_delete.place(x=280, y=180)
+
+        #Entries
+        self.entry = Entry(self.root, width=45, **self.entry_style)
+        self.entry.place(x=70, y=150)
+
+    def __check_mistakes(self, args: str) -> bool:
+        if not args:
+            self.event_label['text'] = 'Введите значение!'
+            return False
+        else:
+            values = args.split(',')
+            try:
+                for item in values:
+                    int(item)
+            except ValueError:
+                self.event_label['text'] = 'Ввести можно только числа!'
+                return False
+        return True
+
+    def __append_base(self, args: str):
+        if self.__check_mistakes(args):
+            values = args.split(',')
+            mistakes = list()
+            for item in values:
+                try:
+                    self.vk.add_by_id(int(item))
+                except sqlite3.IntegrityError:
+                    mistakes.append(item)
+            if mistakes:
+                self.event_label['text'] = f'Записи с ID {",".join(mistakes)} уже существует!'
+
+    def __delete_base(self, args):
+        if self.__check_mistakes(args):
+            values = args.split(',')
+            self.VkBase.delete(*values)
+            self.event_label['text'] = f'Записи с ID {",".join(values)} успешно удалены!'
+
+
 class Console(Window, ButtonActions):
     is_authorized = False
     message = str()
@@ -82,7 +144,7 @@ class Console(Window, ButtonActions):
                 ],
                 'Button': [
                     dict(font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', position=[50, 100], command=lambda: DbView().start()),
-                    dict(font=("Lucida Grande", 12), text='Редактировать базу данных', position=[50, 140]),
+                    dict(font=("Lucida Grande", 12), text='Редактировать базу данных', position=[50, 140], command=lambda: DbChange(self.vk).start()),
                     dict(font=("Lucida Grande", 12), text='Запушить сообщения', position=[50, 200]),
                 ]
             }
