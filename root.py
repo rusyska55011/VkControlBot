@@ -294,3 +294,28 @@ class Window:
     def get_entry_text(element: Entry) -> str:
         return element.get()
 
+
+class Window1:
+    h1 = dict(font=("Lucida Grande", 26), bg='#fafafa', padx=30)
+    h2, h2['font'] = h1.copy(), ("Lucida Grande", 18)
+    h3 = dict(font=("Lucida Grande", 13))
+
+    entry_style = dict(font=("Lucida Grande", 12))
+
+    button_style = dict(font=("Lucida Grande", 10), pady=5, padx=5)
+    start_button_style, start_button_style['font'] = button_style.copy(), ("Lucida Grande", 15)
+
+    def __init__(self, title: str, size: list):
+        self.root = Tk()
+
+        self.root.wm_title(title)
+        self.root.geometry('x'.join(map(lambda item: str(item), size)))
+        self.root.minsize(*size)
+        self.root.maxsize(*size)
+        self.elements()
+
+    def start(self):
+        self.root.mainloop()
+
+    def elements(self):
+        pass

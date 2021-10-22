@@ -1,4 +1,4 @@
-from root import Window, VkBot, VkBase
+from root import Window, VkBot, VkBase, Window1
 import webbrowser
 from tkinter import Tk, Label, Button, Listbox, Entry, Checkbutton, IntVar, END
 
@@ -30,30 +30,13 @@ class Instruction(Window, ButtonActions):
         super(Instruction, self).__init__([554, 400], 'Инструкция', self.elements)
 
 
-class DbView(ButtonActions):
-    h1 = dict(font=("Lucida Grande", 26), bg='#fafafa', padx=30)
-    h2, h2['font'] = h1.copy(), ("Lucida Grande", 18)
-    h3 = dict(font=("Lucida Grande", 13))
-
-    entry_style = dict(font=("Lucida Grande", 12))
-
-    button_style = dict(font=("Lucida Grande", 10), pady=5, padx=5)
-    start_button_style, start_button_style['font'] = button_style.copy(), ("Lucida Grande", 15)
-
+class DbView(Window1,ButtonActions):
     def __init__(self):
         vk_base = VkBase()
         self.cols = vk_base.get_col_names().split(',')
         self.data = vk_base.read()
 
-        title = 'Просмотр базы данных'
-        size = (554, 400)
-        self.root = Tk()
-
-        self.root.wm_title(title)
-        self.root.geometry('x'.join(map(lambda item: str(item), size)))
-        self.root.minsize(*size)
-        self.root.maxsize(*size)
-        self.elements()
+        super(DbView, self).__init__('Просмотр Базы Данных', [554, 400])
 
         self.__append_listbox()
 
@@ -95,7 +78,7 @@ class Console(Window, ButtonActions):
             self.elements = {
                 'Label': [
                     dict(font=("Lucida Grande", 26), text='Консоль управления ботом', bg='#fff', position=[50, 10]),
-                    dict(font=("Lucida Grande", 16), text=f'Приветсвую, {user_info["first_name"]}!', bg='#fff', position=[50, 50])
+                    dict(font=("Lucida Grande", 16), text=f'Приветсвую, {user_info["first_name"]}!', bg='#fff', position=[50, 55])
                 ],
                 'Button': [
                     dict(font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', position=[50, 100], command=lambda: DbView().start()),
