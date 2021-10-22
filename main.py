@@ -2,6 +2,7 @@ import webbrowser
 import sqlite3
 from root import Window, VkBot, VkBase, Window1
 from tkinter import Tk, Label, Button, Listbox, Entry, Checkbutton, IntVar, END
+from threading import Thread
 
 
 class ButtonActions:
@@ -78,7 +79,7 @@ class DbChange(Window1, ButtonActions):
         self.label2 = Label(self.root, text='Введите ID', **self.h3)
         self.label2.place(x=230, y=120)
 
-        self.event_label = Label(self.root, text='Ошибка', fg='#f00', **self.h3)
+        self.event_label = Label(self.root, text='', fg='#f00', **self.h3)
         self.event_label.place(x=10, y=360)
 
         #Buttons
@@ -125,6 +126,41 @@ class DbChange(Window1, ButtonActions):
             self.event_label['text'] = f'Записи с ID {",".join(values)} успешно удалены!'
 
 
+class MessagePush(Window1, ButtonActions):
+    def __init__(self, vk: VkBot):
+        self.vk = vk
+        self.VkBase = VkBase()
+        super(MessagePush, self).__init__('Запушить сообщения', [554, 400])
+
+    def elements(self):
+        # Labels
+        self.label = Label(self.root, text='Пуш сообщений в ЛС', **self.h1)
+        self.label.place(x=66, y=10)
+
+        self.label2 = Label(self.root, text='Введите текст сообщения', **self.h3)
+        self.label2.place(x=170, y=120)
+
+        self.event_label = Label(self.root, text='', fg='#f00', **self.h3)
+        self.event_label.place(x=10, y=360)
+
+        # Entries
+        self.entry = Entry(self.root, width=45, **self.entry_style)
+        self.entry.place(x=70, y=150)
+
+        # Buttons
+        self.button = Button(self.root, text='Запушить', **self.button_style_big, command=lambda: self.__message_push(self.entry.get()))
+        self.button.place(x=225, y=180)
+
+    def __message_push(self, message: str) -> str:
+        self.event_label['text'] = 'Идет процесс пуша. Не выключайте программу'
+        try:
+            self.vk.push_messages(message)
+        except:
+            self.event_label['text'] = 'Процесс приостановлен из-за ошибки'
+        else:
+            self.event_label['text'] = 'Успешно!'
+
+
 class Console(Window, ButtonActions):
     is_authorized = False
     message = str()
@@ -145,7 +181,7 @@ class Console(Window, ButtonActions):
                 'Button': [
                     dict(font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', position=[50, 100], command=lambda: DbView().start()),
                     dict(font=("Lucida Grande", 12), text='Редактировать базу данных', position=[50, 140], command=lambda: DbChange(self.vk).start()),
-                    dict(font=("Lucida Grande", 12), text='Запушить сообщения', position=[50, 200]),
+                    dict(font=("Lucida Grande", 12), text='Запушить сообщения', position=[50, 200], command=lambda: MessagePush(self.vk).start()),
                 ]
             }
         else:
@@ -212,5 +248,5 @@ class Start:
         auth.draw_elements()
         auth.start()
 
-Start()
 
+Start()
