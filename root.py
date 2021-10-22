@@ -55,7 +55,7 @@ class DataBase:
             try:
                 cursor.execute(f'INSERT INTO {self.table_name} ({self.cols_names}) VALUES ({arg});')
             except sqlite3.IntegrityError:
-                print(f'Добавление {arg} невозможно. Элемент с данным ID уже существует')
+                raise sqlite3.IntegrityError(f'Добавление {arg} невозможно. Элемент с данным ID уже существует')
 
     @connect
     def delete(self, cursor, *args: int):
@@ -303,6 +303,7 @@ class Window1:
     entry_style = dict(font=("Lucida Grande", 12))
 
     button_style = dict(font=("Lucida Grande", 10), pady=5, padx=5)
+    button_style_big, button_style_big['font'] = button_style.copy(), dict(font=("Lucida Grande", 16))
     start_button_style, start_button_style['font'] = button_style.copy(), ("Lucida Grande", 15)
 
     def __init__(self, title: str, size: list):
