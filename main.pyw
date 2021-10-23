@@ -1,3 +1,4 @@
+import time
 import webbrowser
 import sqlite3
 from root import Window, VkBot, VkBase, Window1, File, AddUsersChecker
@@ -174,6 +175,9 @@ class AuthAddSettings(Window1, ButtonActions):
         self.label2 = Label(self.root, text='Введите текст сообщения при добавлении', **self.h3)
         self.label2.place(x=108, y=120)
 
+        self.label3 = Label(self.root, text='', fg='#f00', **self.h3)
+        self.label3.place(x=237, y=230)
+
         # Entries
         self.entry = Entry(self.root, width=45, **self.entry_style)
         self.entry.place(x=70, y=150)
@@ -183,7 +187,12 @@ class AuthAddSettings(Window1, ButtonActions):
         self.button.place(x=225, y=180)
 
     def __save_config(self, value):
-        self.file['config'] = (value, )
+        try:
+            self.file['config'] = (value, )
+        except:
+            self.label3['text'] = 'Ошибка'
+        else:
+            self.label3['text'] = 'Успешно'
 
 
 class Console(Window1, ButtonActions):
