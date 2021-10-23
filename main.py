@@ -1,8 +1,7 @@
 import webbrowser
 import sqlite3
-from root import Window, VkBot, VkBase, Window1
-from tkinter import Tk, Label, Button, Listbox, Entry, Checkbutton, IntVar, END
-from threading import Thread
+from root import Window, VkBot, VkBase, Window1, File, AddUsersChecker
+from tkinter import Tk, Label, Button, Listbox, Entry, Checkbutton, Radiobutton, IntVar, END
 
 
 class ButtonActions:
@@ -161,7 +160,33 @@ class MessagePush(Window1, ButtonActions):
             self.event_label['text'] = 'Успешно!'
 
 
-class Console(Window, ButtonActions):
+class AuthAddSettings(Window1, ButtonActions):
+    def __init__(self):
+        self.file = File()
+        super(AuthAddSettings, self).__init__('Настройка автодобавления в друзья', [554, 350])
+        self.entry.insert(0, self.file['config'][0])
+
+    def elements(self):
+        # Labels
+        self.label1 = Label(self.root, text='Настройка автодобавления', **self.h1)
+        self.label1.place(x=50, y=10)
+
+        self.label2 = Label(self.root, text='Введите текст сообщения при добавлении', **self.h3)
+        self.label2.place(x=108, y=120)
+
+        # Entries
+        self.entry = Entry(self.root, width=45, **self.entry_style)
+        self.entry.place(x=70, y=150)
+
+        # Buttons
+        self.button = Button(self.root, text='Сохранить', command=lambda: self.__save_config(self.entry.get()), **self.button_style_big)
+        self.button.place(x=225, y=180)
+
+    def __save_config(self, value):
+        self.file['config'] = (value, )
+
+
+class Console(Window1, ButtonActions):
     is_authorized = False
     message = str()
 
@@ -171,22 +196,36 @@ class Console(Window, ButtonActions):
 
         if self.vk.get_token_valid():
             self.is_authorized = True
-
-            user_info = self.vk.get_profile_info()
-            self.elements = {
-                'Label': [
-                    dict(font=("Lucida Grande", 26), text='Консоль управления ботом', bg='#fff', position=[50, 10]),
-                    dict(font=("Lucida Grande", 16), text=f'Приветсвую, {user_info["first_name"]}!', bg='#fff', position=[50, 55])
-                ],
-                'Button': [
-                    dict(font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', position=[50, 100], command=lambda: DbView().start()),
-                    dict(font=("Lucida Grande", 12), text='Редактировать базу данных', position=[50, 140], command=lambda: DbChange(self.vk).start()),
-                    dict(font=("Lucida Grande", 12), text='Запушить сообщения', position=[50, 200], command=lambda: MessagePush(self.vk).start()),
-                ]
-            }
+            self.user_info = self.vk.get_profile_info()
+            if self.is_authorized:
+                super(Console, self).__init__('Консоль VkApi', [554, 350])
+                self.elements()
         else:
             self.message = 'Введенный токен некорректен'
-            self.elements = dict()
+
+    def elements(self):
+        # Labels
+        self.label1 = Label(self.root, text='Консоль управления ботом', **self.h1)
+        self.label1.place(x=50, y=10)
+
+        self.label2 = Label(self.root, text=f'Приветсвую, {self.user_info["first_name"]}!', **self.h2)
+        self.label2.place(x=50, y=55)
+
+        self.label3 = Label(self.root, text=f'Автодобавление:', **self.h3)
+        self.label3.place(x=50, y=265)
+
+        self.label4 = Label(self.root, text=f'выключено', fg='red', **self.h3)
+        self.label4.place(x=185, y=265)
+
+        # Buttons
+        self.button1 = Button(self.root, font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', command=lambda: DbView().start())
+        self.button1.place(x=50, y=100)
+
+        self.button2 = Button(self.root, font=("Lucida Grande", 12), text='Редактировать базу данных', command=lambda: DbChange(self.vk).start())
+        self.button2.place(x=50, y=140)
+
+        self.button3 = Button(self.root, font=("Lucida Grande", 12), text='Запушить сообщения', command=lambda: MessagePush(self.vk).start())
+        self.button3.place(x=50, y=210)
 
         if self.is_authorized:
             super(Console, self).__init__([554, 250], 'Консоль VkApi', self.elements)
@@ -198,6 +237,12 @@ class Console(Window, ButtonActions):
             'status': self.is_authorized,
             'message': message
         }
+
+    def __add_friend_checker(self):
+        self.label4['text'] = '  включено'
+        file = File()
+        message = file['config'][0]
+        self.user_checker = AddUsersChecker(self.vk, message, self.vk.get_friends_list()).start()
 
 
 class Authorization(Window, ButtonActions):
