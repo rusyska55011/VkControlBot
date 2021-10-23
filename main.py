@@ -227,8 +227,11 @@ class Console(Window1, ButtonActions):
         self.button3 = Button(self.root, font=("Lucida Grande", 12), text='Запушить сообщения', command=lambda: MessagePush(self.vk).start())
         self.button3.place(x=50, y=210)
 
-        if self.is_authorized:
-            super(Console, self).__init__([554, 250], 'Консоль VkApi', self.elements)
+        self.button4 = Button(self.root, font=("Lucida Grande", 8), text='Настроить', command=lambda: AuthAddSettings().start())
+        self.button4.place(x=145, y=295)
+
+        self.button5 = Button(self.root, text='Включить', command=lambda: self.__add_friend_checker(), **self.h3)
+        self.button5.place(x=50, y=290)
 
     def get_response(self) -> dict:
         message = self.message
@@ -279,7 +282,6 @@ class Authorization(Window, ButtonActions):
                 self.change_element('Label', 2, dict(text=message, position=[180, 300]))
                 self.draw_elements()
             else:
-                console.draw_elements()
                 self.quit()
 
     @staticmethod
