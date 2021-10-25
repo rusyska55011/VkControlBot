@@ -195,6 +195,52 @@ class AuthAddSettings(Window1, ButtonActions):
             self.label3['text'] = 'Успешно'
 
 
+class AddFriend(Window1, ButtonActions):
+    def __init__(self, vk: VkBot):
+        self.vk = vk
+        super(AddFriend, self).__init__('Настройка автодобавления в друзья', [554, 350])
+
+    def elements(self):
+        # Labels
+        self.label1 = Label(self.root, text='Рассылка заявок в друзья', **self.h1)
+        self.label1.place(x=38, y=10)
+
+        self.label2 = Label(self.root, text='Текст сообщения', **self.h3)
+        self.label2.place(x=206, y=180)
+
+        self.label3 = Label(self.root, text='Введите ID', **self.h3)
+        self.label3.place(x=230, y=120)
+
+        self.event_label = Label(self.root, text='', fg='#f00', **self.h3)
+        self.event_label.place(x=10, y=315)
+
+        # Buttons
+        self.button_add = Button(self.root, text='Начать', command=lambda: self.send_requests(), **self.button_style_big)
+        self.button_add.place(x=233, y=240)
+
+        # Entries
+        self.entry1 = Entry(self.root, width=45, **self.entry_style)
+        self.entry1.place(x=70, y=150)
+
+        self.entry2 = Entry(self.root, width=45, **self.entry_style)
+        self.entry2.place(x=70, y=210)
+
+    def send_requests(self):
+        self.event_label['text'] = str()
+        users_id = self.entry1.get()
+        print(bool(users_id))
+        print(users_id)
+        if not users_id:
+            self.event_label['text'] = 'Вы не ввели ID пользователей'
+        else:
+            users_id = users_id.split(',')
+            message = self.entry2.get()
+            try:
+                self.vk.send_friend_add_request(message, *users_id)
+            except:
+                self.event_label['text'] = 'Произошла ошибка. Проверьте корректность введенных данных'
+
+
 class Console(Window1, ButtonActions):
     is_authorized = False
     message = str()
@@ -241,6 +287,9 @@ class Console(Window1, ButtonActions):
 
         self.button5 = Button(self.root, text='Включить', command=lambda: self.__add_friend_checker(), **self.h3)
         self.button5.place(x=50, y=290)
+
+        self.button3 = Button(self.root, font=("Lucida Grande", 12), text='Разослать запросы в друзья', command=lambda: AddFriend(self.vk).start())
+        self.button3.place(x=230, y=210)
 
     def get_response(self) -> dict:
         message = self.message

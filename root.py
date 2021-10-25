@@ -171,6 +171,20 @@ class VkBot(Bot):
         name = self.get_vk_name(vk_id)
         self.base.add([vk_id, name])
 
+    def send_friend_add_request(self, message: str, *vk_id: int):
+        message = self._find_vars_in_text(message, vars={'vk_id': vk_id, 'name': self.get_vk_name(vk_id)})
+        if message == 'Error':
+            return 'Error'
+        for user_id in vk_id:
+            try:
+                self.vk.method('friends.add', {
+                    'user_id': int(user_id),
+                    'text': message
+                })
+            except:
+                pass
+            sleep(1.5)
+
 
 class Window:
     def __init__(self, size: list, title: str, elements: dict):
