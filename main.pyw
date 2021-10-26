@@ -1,6 +1,7 @@
-import time
 import webbrowser
 import sqlite3
+from threading import Thread
+from ast import literal_eval
 from root import Window, VkBot, VkBase, Window1, File, AddUsersChecker
 from tkinter import Tk, Label, Button, Listbox, Entry, Checkbutton, Radiobutton, IntVar, END
 
@@ -162,10 +163,12 @@ class MessagePush(Window1, ButtonActions):
 
 
 class AuthAddSettings(Window1, ButtonActions):
+    directory = 'configs\\friend_adder'
+
     def __init__(self):
         self.file = File()
         super(AuthAddSettings, self).__init__('Настройка автодобавления в друзья', [554, 350])
-        self.entry.insert(0, self.file['config'][0])
+        self.entry.insert(0, self.file[self.directory][0])
 
     def elements(self):
         # Labels
@@ -187,8 +190,12 @@ class AuthAddSettings(Window1, ButtonActions):
         self.button.place(x=225, y=180)
 
     def __save_config(self, value):
+        self.label3['text'] = ''
         try:
-            self.file['config'] = (value, )
+            self.file[self.directory] = (value, )
+        except FileNotFoundError:
+            self.file.create_dirs('configs')
+            self.file[self.directory] = (value,)
         except:
             self.label3['text'] = 'Ошибка'
         else:
@@ -228,8 +235,6 @@ class AddFriend(Window1, ButtonActions):
     def send_requests(self):
         self.event_label['text'] = str()
         users_id = self.entry1.get()
-        print(bool(users_id))
-        print(users_id)
         if not users_id:
             self.event_label['text'] = 'Вы не ввели ID пользователей'
         else:
@@ -239,6 +244,53 @@ class AddFriend(Window1, ButtonActions):
                 self.vk.send_friend_add_request(message, *users_id)
             except:
                 self.event_label['text'] = 'Произошла ошибка. Проверьте корректность введенных данных'
+
+
+class ChatBotSettings(Window1, ButtonActions):
+    directory = 'configs\\chat_bot'
+
+    def __init__(self):
+        self.file = File()
+        super(ChatBotSettings, self).__init__('Настройка чат-бота', [554, 350])
+        self.entry.insert(0, self.file[self.directory][0])
+
+    def elements(self):
+        # Labels
+        self.label1 = Label(self.root, text='Настройка чат-бота', **self.h1)
+        self.label1.place(x=84, y=10)
+
+        self.label2 = Label(self.root, text='Введите {"ключ" : "значение", ...}', **self.h3)
+        self.label2.place(x=138, y=120)
+
+        self.label3 = Label(self.root, text='', fg='#f00', **self.h3)
+        self.label3.place(x=237, y=230)
+
+        # Entries
+        self.entry = Entry(self.root, width=45, **self.entry_style)
+        self.entry.place(x=70, y=150)
+
+        # Buttons
+        self.button = Button(self.root, text='Сохранить', command=lambda: self.__save_config(self.entry.get()), **self.button_style_big)
+        self.button.place(x=225, y=180)
+
+    def __save_config(self, value):
+        try:
+            value = literal_eval(value)
+        except:
+            self.label3['text'] = 'Синтаксическая ошибка'
+        else:
+            if isinstance(value, dict):
+                try:
+                    self.file[self.directory] = (str(value),)
+                except FileNotFoundError:
+                    self.file.create_dirs('configs')
+                    self.file[self.directory] = (str(value),)
+                except:
+                    self.label3['text'] = 'Ошибка'
+                else:
+                    self.label3['text'] = 'Успешно'
+            else:
+                self.label3['text'] = 'Синтаксическая ошибка'
 
 
 class Console(Window1, ButtonActions):
@@ -253,7 +305,7 @@ class Console(Window1, ButtonActions):
             self.is_authorized = True
             self.user_info = self.vk.get_profile_info()
             if self.is_authorized:
-                super(Console, self).__init__('Консоль VkApi', [554, 350])
+                super(Console, self).__init__('Консоль VkApi', [554, 450])
                 self.elements()
         else:
             self.message = 'Введенный токен некорректен'
@@ -272,6 +324,12 @@ class Console(Window1, ButtonActions):
         self.label4 = Label(self.root, text=f'выключено', fg='red', **self.h3)
         self.label4.place(x=185, y=265)
 
+        self.label5 = Label(self.root, text=f'Чат-бот:', **self.h3)
+        self.label5.place(x=50, y=345)
+
+        self.label6 = Label(self.root, text=f'выключено', fg='red', **self.h3)
+        self.label6.place(x=115, y=345)
+
         # Buttons
         self.button1 = Button(self.root, font=("Lucida Grande", 12), text='Посмотреть базу данных пользователей', command=lambda: DbView().start())
         self.button1.place(x=50, y=100)
@@ -288,8 +346,14 @@ class Console(Window1, ButtonActions):
         self.button5 = Button(self.root, text='Включить', command=lambda: self.__add_friend_checker(), **self.h3)
         self.button5.place(x=50, y=290)
 
-        self.button3 = Button(self.root, font=("Lucida Grande", 12), text='Разослать запросы в друзья', command=lambda: AddFriend(self.vk).start())
-        self.button3.place(x=230, y=210)
+        self.button6 = Button(self.root, font=("Lucida Grande", 12), text='Разослать запросы в друзья', command=lambda: AddFriend(self.vk).start())
+        self.button6.place(x=230, y=210)
+
+        self.button7 = Button(self.root, text='Включить', command=lambda: self.__add_chatbot(), **self.h3)
+        self.button7.place(x=50, y=370)
+
+        self.button8 = Button(self.root, font=("Lucida Grande", 8), text='Настроить', command=lambda: ChatBotSettings().start())
+        self.button8.place(x=145, y=375)
 
     def get_response(self) -> dict:
         message = self.message
@@ -300,10 +364,44 @@ class Console(Window1, ButtonActions):
         }
 
     def __add_friend_checker(self):
-        self.label4['text'] = '  включено'
-        file = File()
-        message = file['config'][0]
-        self.user_checker = AddUsersChecker(self.vk, message, self.vk.get_friends_list()).start()
+        def reverse(self):
+            self.label4['text'] = 'выключено'
+            self.user_checker.work = False
+
+        if self.label4['text'] == '  включено':
+            reverse(self)
+        else:
+            try:
+                self.user_checker.work = True
+            except AttributeError:
+                pass
+            self.label4['text'] = '  включено'
+            file = File()
+            message = file[AuthAddSettings.directory][0]
+            self.user_checker = AddUsersChecker(self.vk, message, self.vk.get_friends_list())
+            self.user_checker.start()
+
+    def __add_chatbot(self):
+        def reverse(self):
+            self.label6['text'] = 'выключено'
+            self.vk.chat_bot_work = False
+
+        if self.label6['text'] == '  включено':
+            reverse(self)
+        else:
+            self.vk.chat_bot_work = True
+            file = File()
+            bot_asks = file[ChatBotSettings.directory][0]
+            try:
+                bot_asks = literal_eval(bot_asks)
+            except:
+                self.label6['text'] = ' ошибка   '
+
+            if isinstance(bot_asks, dict):
+                self.chatbot = Thread(target=lambda: self.vk.start_longpoll(bot_asks=bot_asks)).start()
+                self.label6['text'] = '  включено'
+            else:
+                self.label6['text'] = ' ошибка   '
 
 
 class Authorization(Window, ButtonActions):
