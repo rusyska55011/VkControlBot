@@ -134,6 +134,11 @@ class VkBot(Bot):
             return True
 
     def start_longpoll(self, bot_asks: dict):
+        new_dict = dict()
+        for key, item in bot_asks.items():
+            new_dict[str(key).capitalize()] = item
+        bot_asks = new_dict
+
         longpoll = VkLongPoll(self.vk)
         for event in longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
