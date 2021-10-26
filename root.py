@@ -105,6 +105,8 @@ class Bot:
 
 
 class VkBot(Bot):
+    chat_bot_work = True
+
     def __init__(self, access_token):
         self.access_token = access_token
 
@@ -141,6 +143,8 @@ class VkBot(Bot):
 
         longpoll = VkLongPoll(self.vk)
         for event in longpoll.listen():
+            if not self.chat_bot_work:
+                break
             if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text:
                 if event.from_user:
                     message_from = str(event.text).capitalize()
@@ -400,6 +404,8 @@ class File:
 
 
 class AddUsersChecker:
+    work = True
+
     def __init__(self, vk_bot, message_for_added_users: str, friends_list: list):
         self.message_for_added_users = message_for_added_users
         self.friends_list = friends_list
@@ -411,6 +417,9 @@ class AddUsersChecker:
 
     def __process(self):
         while True:
+            if not self.work:
+                break
+
             get_friends = self.vk_bot.get_friends_list()
             check = self.check_friends(self.friends_list, get_friends)
 
