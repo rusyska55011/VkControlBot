@@ -343,6 +343,9 @@ class Window1:
     def start(self):
         self.root.mainloop()
 
+    def quit(self):
+        self.root.destroy()
+
     def elements(self):
         pass
 
