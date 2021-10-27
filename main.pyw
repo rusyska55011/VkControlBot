@@ -404,41 +404,47 @@ class Console(Window1, ButtonActions):
                 self.label6['text'] = ' ошибка   '
 
 
-class Authorization(Window, ButtonActions):
+class Authorization(Window1, ButtonActions):
     token = None
 
     def __init__(self):
-        self.elements = {
-            'Label': [
-                dict(font=("Lucida Grande", 26), text='Авторизация через токен', bg='#fff', position=[70, 50]),
-                dict(font=("Lucida Grande", 12), text='Введите токен:', position=[222, 165]),
-                dict(font=("Lucida Grande", 12), fg='#F00', position=[200, 300])
-            ],
-            'Button': [
-                dict(font=("Lucida Grande", 12), text='Подключиться',
-                     command=lambda: self.__open_console(0), position=[220, 250]),
-                dict(font=("Lucida Grande", 9), text='Как получить токен',
-                     command=lambda: self.__open_instruction(), position=[10, 363]),
-            ],
-            'Entry': [
-                dict(font=("Lucida Grande", 12), width=50, position=[50, 200])
-            ],
-        }
-        super(Authorization, self).__init__([554, 400], 'Авторизация', self.elements)
+        super(Authorization, self).__init__('Авторизация', [554, 400])
 
-    def __open_console(self, text_position: int) -> dict:
-        token = self.get_entry_text(self.get_elements()['Entry'][int(text_position)])
+    def elements(self):
+        #Labels
+        self.label1 = Label(self.root, text='Авторизация через токен', **self.h1)
+        self.label1.place(x=43, y=50)
+
+        self.label2 = Label(self.root, text='Введите токен:', **self.h3)
+        self.label2.place(x=222, y=165)
+
+        self.label3 = Label(self.root, text='', **self.h3, fg='#F00')
+        self.label3.place(x=170, y=300)
+
+        #Buttons
+        self.button1 = Button(self.root, text='Подключиться', command=lambda: self.__open_console(), **self.h3)
+        self.button1.place(x=218, y=250)
+
+        self.button2 = Button(self.root, font=("Lucida Grande", 9), text='Как получить токен', command=lambda: self.__open_instruction())
+        self.button2.place(x=10, y=363)
+
+        #Entries
+        self.entry = Entry(self.root, width=50, **self.h3)
+        self.entry.place(x=50, y=200)
+
+    def __open_console(self):
+        self.label3['text'] = ''
+        token = self.entry.get()
         if not token:
-            self.change_element('Label', 2, dict(text='Вы не ввели значение!', position=[200, 300]))
-            self.draw_elements()
+            self.label3['text'] = '    Вы не ввели значение!'
         else:
             console = Console(token=token)
             response, message = console.get_response().values()
             if not response:
-                self.change_element('Label', 2, dict(text=message, position=[180, 300]))
-                self.draw_elements()
+                self.label3['text'] = str(message)
             else:
                 self.quit()
+                console.start()
 
     @staticmethod
     def __open_instruction():
@@ -448,7 +454,6 @@ class Authorization(Window, ButtonActions):
 class Start:
     def __init__(self):
         auth = Authorization()
-        auth.draw_elements()
         auth.start()
 
 
