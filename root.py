@@ -432,7 +432,7 @@ class AddUsersChecker:
                     self.vk_bot.send_message(vk_id, self.message_for_added_users)
                 # Чтобы бот забывал друзей, которые удались из списка друзей,
                 # можно передвинуть переменную за блок if
-            self.friends_list = get_friends
+            self.friends_list = get_friends.copy()
 
             sleep(randint(5, 15))
 
