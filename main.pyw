@@ -2,7 +2,7 @@ import webbrowser
 import sqlite3
 from threading import Thread
 from ast import literal_eval
-from root import Window, VkBot, VkBase, Window1, File, AddUsersChecker
+from root import Window, VkBot, VkBase, File, AddUsersChecker
 from tkinter import Tk, Label, Button, Listbox, Entry, Checkbutton, Radiobutton, IntVar, END
 
 
@@ -21,19 +21,20 @@ class Instruction(Window, ButtonActions):
     ]
 
     def __init__(self):
-        self.elements = {
-            'Label': [
-                dict(font=("Lucida Grande", 26), text='Как получить токен?', bg='#fff', position=[10, 30]),
-            ] + self.generate_paragraphs(self.instruction_text, [10, 80], 25, dict(font=("Lucida Grande", 12)), True),
-            'Button': [
-                dict(font=("Lucida Grande", 12), text='Перейти на страницу получения токена', command=lambda: self._open_browser(self.link),
-                     position=[10, 240]),
-            ],
-        }
-        super(Instruction, self).__init__([554, 400], 'Инструкция', self.elements)
+        super(Instruction, self).__init__('Инструкция', [554, 400])
+
+    def elements(self):
+        self.label = Label(self.root, text='Как получить токен?', **self.h1)
+        self.label.place(x=75, y=30)
+
+        self.button = Button(self.root, text='Перейти на страницу получения токена', command=lambda: self._open_browser(self.link), **self.h3)
+        self.button.place(x=112, y=240)
+
+        self.text = Label(self.root, text='\n'.join([f'{i + 1}. {self.instruction_text[i]}' for i in range(len(self.instruction_text))]), font=("Lucida Grande", 11))
+        self.text.place(x=27, y=100)
 
 
-class DbView(Window1, ButtonActions):
+class DbView(Window, ButtonActions):
     def __init__(self):
         vk_base = VkBase()
         self.cols = vk_base.get_col_names().split(',')
@@ -42,9 +43,6 @@ class DbView(Window1, ButtonActions):
         super(DbView, self).__init__('Просмотр Базы Данных', [554, 400])
 
         self.__append_listbox()
-
-    def start(self):
-        self.root.mainloop()
 
     def __append_listbox(self):
         for item in self.data:
@@ -66,7 +64,7 @@ class DbView(Window1, ButtonActions):
         self.listbox.place(x=10, y=70)
 
 
-class DbChange(Window1, ButtonActions):
+class DbChange(Window, ButtonActions):
     def __init__(self, vk: VkBot):
         self.vk = vk
         self.VkBase = VkBase()
@@ -127,7 +125,7 @@ class DbChange(Window1, ButtonActions):
             self.event_label['text'] = f'Записи с ID {",".join(values)} успешно удалены!'
 
 
-class MessagePush(Window1, ButtonActions):
+class MessagePush(Window, ButtonActions):
     def __init__(self, vk: VkBot):
         self.vk = vk
         self.VkBase = VkBase()
@@ -162,7 +160,7 @@ class MessagePush(Window1, ButtonActions):
             self.event_label['text'] = 'Успешно!'
 
 
-class AuthAddSettings(Window1, ButtonActions):
+class AuthAddSettings(Window, ButtonActions):
     directory = 'configs\\friend_adder'
 
     def __init__(self):
@@ -202,7 +200,7 @@ class AuthAddSettings(Window1, ButtonActions):
             self.label3['text'] = 'Успешно'
 
 
-class AddFriend(Window1, ButtonActions):
+class AddFriend(Window, ButtonActions):
     def __init__(self, vk: VkBot):
         self.vk = vk
         super(AddFriend, self).__init__('Настройка автодобавления в друзья', [554, 350])
@@ -246,7 +244,7 @@ class AddFriend(Window1, ButtonActions):
                 self.event_label['text'] = 'Произошла ошибка. Проверьте корректность введенных данных'
 
 
-class ChatBotSettings(Window1, ButtonActions):
+class ChatBotSettings(Window, ButtonActions):
     directory = 'configs\\chat_bot'
 
     def __init__(self):
@@ -293,7 +291,7 @@ class ChatBotSettings(Window1, ButtonActions):
                 self.label3['text'] = 'Синтаксическая ошибка'
 
 
-class Console(Window1, ButtonActions):
+class Console(Window, ButtonActions):
     is_authorized = False
     message = str()
 
@@ -404,7 +402,7 @@ class Console(Window1, ButtonActions):
                 self.label6['text'] = ' ошибка   '
 
 
-class Authorization(Window1, ButtonActions):
+class Authorization(Window, ButtonActions):
     token = None
 
     def __init__(self):
@@ -448,7 +446,7 @@ class Authorization(Window1, ButtonActions):
 
     @staticmethod
     def __open_instruction():
-        Instruction().draw_elements()
+        Instruction().start()
 
 
 class Start:
